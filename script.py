@@ -23,12 +23,10 @@ train =  a_train[:]
 for c in c_train:
     train.append(c)
 '''
-train = a_train[:]
-for c in c_train:
-    train.append(c)
+train = np.array(a_train)
+train = np.concatenate((train, np.array(c_train)))
 
-t = np.array(train)
-t = np.expand_dims(t, axis=3)
+t = np.expand_dims(train, axis=3)
 print("shape t = ", t.shape)
 
 
@@ -66,8 +64,9 @@ print(model.shape)
 # #Activation('softmax'),
 # ])
 
-a = Input(shape=(256,64))
+a = Input(shape=train.shape[0])
 b = Dense(32)(a)
+b = Dense(1)(a)
 model = Model(inputs=a,outputs=b)
 
 plot_model(model, show_shapes=True, to_file="firstLayer.png")
