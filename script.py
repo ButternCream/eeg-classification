@@ -1,5 +1,6 @@
 import os
 import numpy as np
+import keras
 from keras.models import Sequential, Model
 from keras.layers import Input, Dense, Dropout, Activation, Flatten, Reshape
 from keras.layers import Conv2D, MaxPooling2D, Conv1D
@@ -7,77 +8,44 @@ from keras.utils import np_utils
 from Data import fetch_and_compress, load
 from keras.utils import plot_model
 # Compress each persons file data into one numpy file
-#print("Compressing data")
-#fetch_and_compress(['./alcoholic/', './control/'])
+
+
 print("Loading")
-#load(['./alcohol_compressed/', './control_compressed/'])
 a_train, a_test = load('./alcohol_compressed/', .7)
 c_train, c_test = load('./control_compressed/', .7)
-#print("Dimensions atrain: ", len(a_train), "x", len(a_train[0]))
 print('Loaded')
 
-trainLabels = [1 for i in range(len(a_train))] + [0 for j in range(len(c_train))]
-#trainLabels = [1 for i in range(int(1/3*len(c_train)))] + [0 for j in range(int(2/3*len(c_train))+ 1)]
-'''
-train =  a_train[:]
-for c in c_train:
-    train.append(c)
-'''
-train = np.array(a_train)
-train = np.concatenate((train, np.array(c_train)))
 
-t = np.expand_dims(train, axis=3)
-print("shape t = ", t.shape)
+# simpler format for building your arrays
+x_one = np.array(a_train)
+x_two = np.array(c_train)
+x = np.concatenate((x_one, x_two))
+
+y_one = np.ones((x_one.shape[0], 1)) # create array of ones for those in alc
+y_two = np.zeros((x_two.shape[0], 1)) # create array of 0's for those in control
+y = np.concatenate((y_one, y_two)) # concat in the same order as x
+x = np.expand_dims(x, axis=3)
+print("x shape: ", x.shape)
+print("y shape: ", y.shape)
+
+# normalize x
+x = x/255
+
+# build our model. The example provided by Boaz/Mathew requires a base model, this builds a model without a base provided. 
+model = Sequential()
+model.add(Dense(32, input_shape=x.shape[1:]))
+model.add(Activation('relu'))
+model.add(Flatten()) # must flatten to ensure we have a 1d array going into our prediction layer
+model.add(Dense(1))
+model.add(Activation('sigmoid'))
+
+print("compiling model")
+optimizer = keras.optimizers.Adam(lr=0.001) # see keras optimizers for other examples
+model.compile(optimizer=optimizer,
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+print("model compiled")
 
 
-
-# print('Declaring model')
-# model = Sequential()
-# model.add(Dense(1, activation='relu', input_shape=t.shape))
-# #plot_model(model, to_file="firstLayer.png")
-# print('Adding 1st Dense?')
-# #model.add(Conv2D(32, (3,3), activation='relu'))
-# model.add(Dense(3))
-# #model.add(Dense(4))
-# #model.add(Dense(4))
-# #model.add(Flatten())
-# model.add(Dense(1))
-# print(model.output_shape)
-# print('Adding 2nd Dense?')
-
-'''
-model.add(Conv2D(32, (3,3), activation='relu', input_shape=(16384,)))
-
-model.add(Dropout(0.25))
-model.add(Flatten())
-model.add(Dense(128, activation='softmax'))
-model.add(Dropout(0.5))
-model.add(Dense(1, activation='relu'))
-print(model.shape)
-'''
-
-# model = Sequential(
-# [
-# Dense(32, input_shape = (256, 64, 1),name='Dense-Layer-1'),
-# Dense(1, name='output-layer'),
-# Activation('relu'),
-# #Activation('softmax'),
-# ])
-
-a = Input(shape=train.shape[0])
-b = Dense(32)(a)
-b = Dense(1)(a)
-model = Model(inputs=a,outputs=b)
-
-plot_model(model, show_shapes=True, to_file="firstLayer.png")
-
-model.compile(optimizer='rmsprop',
-loss='binary_crossentropy',
-metrics=['accuracy'])
-#trainNP = np.matrix(t)
-#print(trainNP)
-trainLabels = np.array(trainLabels)
-trainLabels = np.expand_dims(trainLabels, axis=1)
-print('Shape = ',trainLabels.shape)
-model.fit(t, trainLabels, epochs=50, batch_size=32)
+model.fit(x, y, epochs=30, batch_size=32)
 
