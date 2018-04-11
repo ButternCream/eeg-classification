@@ -10,8 +10,9 @@ def get_features():
     feats = extract_features(c_train[-3:])
     print("length c_train[:-3]", len(c_train[-3:]))
     print(len(feats))
-    for i in c_train[-3]:
-        print(i[12])
+    #for i in c_train[-3]:
+    #    print(i[12])
+    # Test
     print(feats[0])
     #########################################################
 

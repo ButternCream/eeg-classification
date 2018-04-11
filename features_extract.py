@@ -6,6 +6,7 @@ def extract_features(L):
     for i in L:
         features.append(extract_for_file(i))
     return features
+
 #expects 256x64 array
 def extract_for_file(A):
     #feature will be the following:
@@ -32,7 +33,29 @@ def extract_for_file(A):
 
         #lms = Thread(...)
         #threads.apend(lms)
+        
+        # Mean / Avg
+        t_mean = Thread(target=find_mean, args=(A,i,means))
+        threads.append(t_mean)
 
+        # Median
+        t_median = Thread(target=find_median, args=(A,i,medians))
+        threads.append(t_median)
+        # Could probably shorten everything to
+        # threads += [Thread(target=find_median, args=(A,i,medians)) for i in range(64)]
+
+        # Sum
+        t_sums = Thread(target=find_sums, args=(A,i,sums))
+        threads.append(t_sums)
+        
+        # Need to redo global functions
+        # Global min
+        # t_globalMin = Thread(target=find_global_min, args=(A,i,gmins))
+        # threads.append(t_globalMin)
+        
+        # Global max
+        # t_globalMax = Thread(target=find_global_max, args=(A,i,gmaxes))
+        # threads.append(t_globalMax)
 
         
 
@@ -40,7 +63,8 @@ def extract_for_file(A):
         j.start()
     for k in threads: #join threads; wait for all threads to finish
         k.join()
-    features = np.transpose(np.array([zeros]))#add other arrays here comma seperated, i.e. [zeros, lmaxes,...]
+
+    features = np.transpose(np.array([zeros, means, medians, sums]))#add other arrays here comma seperated, i.e. [zeros, lmaxes,...]
     return features
     
 def threaded_zeros(A, col_idx, zs):
@@ -50,5 +74,40 @@ def threaded_zeros(A, col_idx, zs):
             #^ check for 0 crossing
             crossings+=1
     zs[col_idx] = crossings
-    
-    
+
+def find_mean(A, col, means_array):
+    s = 0
+    for i in range(0,256):
+        s += A[i][col]
+    means_array[col] = s/256
+
+def find_median(A,col,medians_array):
+    sorted_list = [A[i][col] for i in range(0,256)]
+    sorted_list.sort()
+    med_index = int(len(sorted_list)/2)
+    if len(sorted_list) % 2 == 0:
+        medians_array[col] = ((sorted_list[med_index-1] + sorted_list[med_index]) / 2)
+    else:
+        medians_array[col] = sorted_list[med_index]
+
+def find_sums(A,col,sums_array):
+    s = 0
+    for i in range(0,256):
+        s += A[i][col]
+    sums_array[col] = s
+
+''' Redo
+def find_global_min(A,col,gmin_array):
+    smallest = None
+    for i in range(0,256):
+        if smallest is None or A[i][col] < smallest:
+            smallest = A[i][col]
+    gmin_array[col] = smallest
+
+def find_global_max(A,col,gmax_array):
+    biggest = None
+    for i in range(0,256):
+        if biggest is None or A[i][col] > biggest:
+            biggest = A[i][col]
+    gmax_array[col] = biggest
+'''
