@@ -1,3 +1,4 @@
+from threading import Thread
 #expects giant list; main driver
 def extract_features(L):
     features = []
@@ -23,14 +24,23 @@ def extract_for_file(A):
     gmins = [[]for i in range(64)]
     ##8. global max (check the max of 63 others and 1 for max and 0 for other 63)
     gmaxes = [[]for i in range(64)]
-    for in in range(64):
+    threads = []
+    for i in range(64): #create threads
+        z = Thread(target=threaded_zeros, args=(A, i, zeros))
+        threads.append(z)
         
+
+    for j in threads: #start threads
+        j.start()
+    for k in threads: #join threads; wait for all threads to finish
+        k.join()
+    
 def threaded_zeros(A, col_idx, zs):
     crossings = 0;
     for i in range(1, 256):
         if(A[i-1][col_idx] < 0 && A[i][col_idx] > 0) || (A[i-1][col_idx] > 0 && A[i][col_idx] < 0):
             #^ check for 0 crossing
             crossings+=1
-    zs[col_idx] = crossings;
+    zs[col_idx] = crossings
     
     
