@@ -76,10 +76,7 @@ def threaded_zeros(A, col_idx, zs):
     zs[col_idx] = crossings
 
 def find_mean(A, col, means_array):
-    s = 0
-    for i in range(0,256):
-        s += A[i][col]
-    means_array[col] = s/256
+    means_array[col] = sum(A[:][col])/256
 
 def find_median(A,col,medians_array):
     sorted_list = [A[i][col] for i in range(0,256)]
@@ -91,10 +88,7 @@ def find_median(A,col,medians_array):
         medians_array[col] = sorted_list[med_index]
 
 def find_sums(A,col,sums_array):
-    s = 0
-    for i in range(0,256):
-        s += A[i][col]
-    sums_array[col] = s
+    sums_array[col] = sum(A[:][col])
 
 ''' Redo
 def find_global_min(A,col,gmin_array):
