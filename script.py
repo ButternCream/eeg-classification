@@ -29,7 +29,7 @@ print("x shape: ", x.shape)
 print("y shape: ", y.shape)
 
 # normalize x
-x = x/255
+x = x / 255
 
 # build our model. The example provided by Boaz/Mathew requires a base model, this builds a model without a base provided. 
 model = Sequential()
@@ -46,6 +46,8 @@ model.compile(optimizer=optimizer,
               metrics=['accuracy'])
 print("model compiled")
 
+from keras.callbacks import EarlyStopping
+my_callbacks = [EarlyStopping(monitor='acc', patience=5,mode=max)]
 
-model.fit(x, y, epochs=30, batch_size=32)
+model.fit(x, y, epochs=30, batch_size=32, callbacks=my_callbacks)
 
