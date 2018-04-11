@@ -9,11 +9,11 @@ def get_features():
     ################Testing extract_features#################
     feats = extract_features(c_train[-3:])
     print("length c_train[:-3]", len(c_train[-3:]))
-    print(len(feats))
-    #for i in c_train[-3]:
-    #    print(i[12])
-    # Test
-    print(feats[0])
+    print("printing FP1 column:")
+    for i in c_train[-3]:
+        print(i[0])
+    print("printing features for the above columnn")
+    print(feats[0][0])
     #########################################################
 
 

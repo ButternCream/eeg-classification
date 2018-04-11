@@ -28,11 +28,13 @@ def extract_for_file(A):
     gmaxes = [[]for i in range(64)]
     threads = []
     for i in range(64): #create threads
-        z = Thread(target=threaded_zeros, args=(A, i, zeros))
-        threads.append(z)
+        #zero crossings
+        t_zero = Thread(target=threaded_zeros, args=(A, i, zeros))
+        threads.append(t_zero)
 
-        #lms = Thread(...)
-        #threads.apend(lms)
+        # amount of local maxes and mins
+        t_locals = Thread(target=find_locals, args=(A, i, lmaxes, lmins))
+        threads.append(t_locals)
         
         # Mean / Avg
         t_mean = Thread(target=find_mean, args=(A,i,means))
@@ -50,31 +52,43 @@ def extract_for_file(A):
         
         # Need to redo global functions
         # Global min
-        # t_globalMin = Thread(target=find_global_min, args=(A,i,gmins))
-        # threads.append(t_globalMin)
+        t_globalMin = Thread(target=find_global_min, args=(A,i,gmins))
+        threads.append(t_globalMin)
         
         # Global max
-        # t_globalMax = Thread(target=find_global_max, args=(A,i,gmaxes))
-        # threads.append(t_globalMax)
-
+        t_globalMax = Thread(target=find_global_max, args=(A,i,gmaxes))
+        threads.append(t_globalMax)
         
-
+    
+        
     for j in threads: #start threads
         j.start()
     for k in threads: #join threads; wait for all threads to finish
         k.join()
 
-    features = np.transpose(np.array([zeros, means, medians, sums]))#add other arrays here comma seperated, i.e. [zeros, lmaxes,...]
+    features = np.transpose(np.array([zeros, lmaxes, lmins, means, medians, sums, gmaxes, gmins], dtype='float32'))#add other arrays here comma seperated, i.e. [zeros, lmaxes,...]
     return features
-    
-def threaded_zeros(A, col_idx, zs):
-    crossings = 0;
+
+
+def threaded_zeros(A, col, zs):
+    crossings = 0
     for i in range(1, 256):
-        if(A[i-1][col_idx] < 0 and A[i][col_idx] > 0) or (A[i-1][col_idx] > 0 and A[i][col_idx] < 0):
+        if(A[i-1][col] < 0 and A[i][col] > 0) or (A[i-1][col] > 0 and A[i][col] < 0):
             #^ check for 0 crossing
             crossings+=1
-    zs[col_idx] = crossings
+    zs[col] = crossings
 
+def find_locals(A, col, maxes_array, mins_array):
+    maxes = 0
+    mins = 0
+    for i in range(1, 255):
+        if(A[i-1][col] < A[i][col] and A[i][col] > A[i+1][col] ):
+            maxes += 1
+        elif(A[i-1][col] > A[i][col] and A[i][col] < A[i+1][col]):
+            mins += 1
+    maxes_array[col] = maxes
+    mins_array[col] = mins
+    
 def find_mean(A, col, means_array):
     means_array[col] = sum(A[:][col])/256
 
@@ -90,7 +104,7 @@ def find_median(A,col,medians_array):
 def find_sums(A,col,sums_array):
     sums_array[col] = sum(A[:][col])
 
-''' Redo
+
 def find_global_min(A,col,gmin_array):
     smallest = None
     for i in range(0,256):
@@ -104,4 +118,3 @@ def find_global_max(A,col,gmax_array):
         if biggest is None or A[i][col] > biggest:
             biggest = A[i][col]
     gmax_array[col] = biggest
-'''
