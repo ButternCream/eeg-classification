@@ -67,7 +67,7 @@ def load(label, percentage):
     for dirpath, dirs, files in os.walk(label):
         total  = int(percentage*len(files))
         print("Getting " + str(total) + "/" + str(len(files)) + " files")
-        for i,f in enumerate(files):
+        for i,f in enumerate(sorted(files)):
             path = os.path.join(dirpath, f)
             print(path)
             if i < total:
