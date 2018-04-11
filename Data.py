@@ -61,7 +61,7 @@ def fetch_and_compress(labels):
     for label in labels:
         compress_and_save(label)
 #@timer
-def load(label, percentage):
+def load(label, percentage, testing=False):
     train = []
     test = []
     for dirpath, dirs, files in os.walk(label):
@@ -71,14 +71,17 @@ def load(label, percentage):
             path = os.path.join(dirpath, f)
             print(path)
             if i < total:
-                temp = np.load(path).tolist()
-                for l in temp:
-                    train.append(l)
+                temp = np.load(path, fix_imports=True).tolist()
+                if len(np.array(temp).shape) != 2:
+                    for l in temp:
+                        train.append(l)
                 #train.append(np.load(path).tolist())
             else:
-                temp = np.load(path).tolist()
-                for l in temp:
-                    test.append(l)
+                temp = np.load(path, fix_imports=True).tolist()
+                if len(np.array(temp).shape) != 2:
+                    for l in temp:
+                        test.append(l)
                 #test.append(np.load(path).tolist())
     return train, test
 
+load('./control_compressed/', .7, testing=True)
