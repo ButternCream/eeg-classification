@@ -66,19 +66,16 @@ def load(label, percentage):
     test = []
     for dirpath, dirs, files in os.walk(label):
         total  = int(percentage*len(files))
-        print("Getting " + str(total) + "/" + str(len(files)) + " files")
+        print("Collecting files")
         for i,f in enumerate(sorted(files)):
             path = os.path.join(dirpath, f)
-            print(path)
             if i < total:
                 temp = np.load(path).tolist()
                 for l in temp:
                     train.append(l)
-                #train.append(np.load(path).tolist())
             else:
                 temp = np.load(path).tolist()
                 for l in temp:
                     test.append(l)
-                #test.append(np.load(path).tolist())
     return train, test
 
