@@ -81,18 +81,18 @@ def load(label, percentage):
 
     # find faulty data
     s = set()
-    correct = 0,
+    correct = 0
     incorrect = 0
     for k, i in enumerate(test):
         for j in i:
-            if(len(j) ==64):
-                correct +=1
+            if(len(j) == 64):
+                correct += 1
             else:
                 s.add(k)
-                incorrect+=1
-
+                incorrect += 1
+  
     #remove faulty data
-    test = [item for i, item in enumerate(test) if i note in s]
+    test = [item for i, item in enumerate(test) if i not in s]
     
     return train, test
 
