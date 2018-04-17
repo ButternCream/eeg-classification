@@ -24,6 +24,7 @@ print('concatenated x1 and x2')
 
 samples, r,c = x.shape
 x = np.reshape(x, (samples,r*c))
+
 samples, r,c = t.shape
 t = np.reshape(t, (samples,r*c))
 
@@ -43,9 +44,29 @@ y = y.ravel()
 
 classifier = KNeighborsClassifier(n_neighbors=4)
 classifier.fit(x,y)
+
+x_one = np.array(a_test)
+x_two = np.array(c_test)
+x = np.concatenate((x_one, x_two))
+
+samples, r,c = x.shape
+x = np.reshape(x, (samples,r*c))
+
+y_one = np.ones((x_one.shape[0], 1)) # create array of ones for those in alc
+y_two = np.zeros((x_two.shape[0], 1)) # create array of 0's for those in control
+y = np.concatenate((y_one, y_two)) # concat in the same order as x
+
+x = x / 255
+y = y.ravel()
+
 results = classifier.predict(x)
 print(metrics.accuracy_score(y, results))
-
+'''
+plt.xlabel("K Value for KNN")
+plt.ylabel("Accuracy")
+plt.plot(k_range, scores)
+plt.show()
+'''
 # results = classifier.predict(t) # Doesn't work
 # print(metrics.accuracy_score(t, results)) # ^
 
