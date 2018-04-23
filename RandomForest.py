@@ -1,7 +1,7 @@
 from features_extract import extract_features
 from Data import load
 from Utils import normalize, concat, create_labels
-from sklearn.neighbors import KNeighborsClassifier
+from Utils import Features
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 import numpy as np
