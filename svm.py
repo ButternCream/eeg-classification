@@ -1,7 +1,6 @@
 from features_extract import extract_features
 from Data import load
 from Utils import normalize, concat, create_labels
-from Utils import Features as ft
 from sklearn import metrics, svm
 import numpy as np
 

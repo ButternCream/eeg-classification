@@ -9,11 +9,15 @@ from keras.utils import np_utils
 from Data import fetch_and_compress, load
 from keras.utils import plot_model
 import matplotlib.pyplot as plt
+from Utils import extract_features
 # Compress each persons file data into one numpy file
 print("Loading")
 a_train, a_test = load('./alcohol_compressed/', .8)
 c_train, c_test = load('./control_compressed/', .8)
 print('Loaded')
+
+print("Extracting features")
+features = extract_features(c_test)
 
 model = None
 if not os.path.isfile("eeg_TrainedModel.h5"):

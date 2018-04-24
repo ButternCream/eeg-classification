@@ -40,9 +40,9 @@ normalize(test_data)
 
 print("Normalized test data")
 
-print()
+print("Using K = 4")
 
-classifier = KNeighborsClassifier(n_neighbors=4)
+classifier = KNeighborsClassifier(n_neighbors=3)
 classifier.fit(x,y)
 
 results = classifier.predict(test_data)

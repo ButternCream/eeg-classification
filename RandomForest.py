@@ -1,7 +1,6 @@
-from features_extract import extract_features
+from Utils import extract_features
 from Data import load
 from Utils import normalize, concat, create_labels
-from Utils import Features
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 import numpy as np
@@ -18,6 +17,14 @@ samples, r,c = x.shape
 x = np.reshape(x, (samples,r*c))
 
 y = create_labels(len(a_train), len(c_train)).ravel()
+
+print("Getting features... come back in 30 minutes.")
+a_train_features = np.load("a_train_feat.npy")
+print(a_train_features)
+a_test_features = np.load("a_test_feat.npy")
+c_train_features = np.load("c_train_feat.npy")
+c_test_features = np.load("c_test_feat.npy")
+print("How was dinner?")
 
 print("Created training data and labels")
 print("x shape: ", x.shape)
