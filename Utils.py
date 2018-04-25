@@ -1,12 +1,12 @@
 import numpy as np
 from threading import Thread
 from Data import timer
+from PIL import Image
 
 def normalize(array):
-    a_max = np.max(array)
-    a_min = np.min(array)
-    diff = a_max - a_min
-    array = array / diff
+    a_min = np.amin(array)
+    array = array - a_min
+    array = array / 255
 
 def concat(list_one, list_two):
     return np.concatenate((np.array(list_one), np.array(list_two)))
@@ -131,3 +131,76 @@ def find_global_max(A,col,gmax_array):
         if biggest is None or A[i][col] > biggest:
             biggest = A[i][col]
     gmax_array[col] = biggest
+
+
+
+
+def print_cm(cm, labels, hide_zeroes=False,
+             hide_diagonal=False, hide_threshold=None, output_file=None):
+        """pretty print for confusion matrixes"""
+
+        from io import StringIO
+        import sys
+
+        old_stdout = sys.stdout
+        sys.stdout = string = StringIO()
+        
+        columnwidth = max([len(x) for x in labels] + [5])  # 5 is value length
+        empty_cell = " " * columnwidth
+        # Print header
+        print("    " + empty_cell, end=" ")
+        for label in labels:
+                print("%{0}s".format(columnwidth) % label, end=" ")
+        print()
+        # Print rows
+        for i, label1 in enumerate(labels):
+                print("    %{0}s".format(columnwidth) % label1, end=" ")
+                for j in range(len(labels)):
+                        cell = "%{0}.1f".format(columnwidth) % cm[i, j]
+                        if hide_zeroes:
+                                cell = cell if float(cm[i, j]) != 0 else empty_cell
+                        if hide_diagonal:
+                                cell = cell if i != j else empty_cell
+                        if hide_threshold:
+                                cell = cell if cm[i, j] > hide_threshold else empty_cell
+                        print(cell, end=" ")
+                print()
+                
+        sys.stdout = old_stdout
+        print(string.getvalue())
+        return string.getvalue()
+
+                
+def confusion_matrix(Y_true, Y_pred, labels=None, verbose=False):
+        '''
+        returns array, shape
+        '''
+        from sklearn.metrics import confusion_matrix
+
+        # by defaults keras uses the round function to assign classes.
+        # Thus the default threshold is 0.5
+
+        Y_pred = np.rint(Y_pred[:,0])
+        Y_true = Y_true[:,0]
+        
+        if verbose is True:
+                print("Y_true: ", str(Y_true))
+                print("Y_preds: ", str(Y_pred))
+
+        return confusion_matrix(Y_true,Y_pred, labels=labels)
+        
+
+def convert_to_images(images, image_size):
+    new_images = []
+    i = 0
+    for image in images:
+        if image is not None:
+            i += 1
+            image = np.squeeze(image)
+            bw_image = Image.fromarray(image,"L")
+            rbg_image = Image.new("RGB", bw_image.size)
+            rbg_image.paste(bw_image)
+            rbg_image = rbg_image.resize((image_size,image_size), Image.ANTIALIAS)
+            np_image = np.array(rbg_image)
+            new_images.append(np_image)
+    return np.array(new_images)

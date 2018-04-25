@@ -9,46 +9,49 @@ a_train, a_test = load('./alcohol_compressed/', .7)
 c_train, c_test = load('./control_compressed/', .7)
 print('Loaded')
 
-# simpler format for building your arrays
-x = concat(a_train, c_train)
-print('concatenated x1 and x2')
+a_train = np.array(a_train)
 
-samples, r,c = x.shape
-x = np.reshape(x, (samples,r*c))
-
-y = create_labels(len(a_train), len(c_train)).ravel()
+print(a_train.shape)
 
 print("Getting features... come back in 30 minutes.")
 a_train_features = np.load("a_train_feat.npy")
-print(a_train_features)
 a_test_features = np.load("a_test_feat.npy")
 c_train_features = np.load("c_train_feat.npy")
 c_test_features = np.load("c_test_feat.npy")
 print("How was dinner?")
 
-print("Created training data and labels")
-print("x shape: ", x.shape)
-print("y shape: ", y.shape)
+# simpler format for building your arrays
+x = concat(a_train_features, c_train_features)
+print('concatenated x1 and x2')
+
+print(x.shape)
+samples, r,c = x.shape
+x = np.reshape(x, (samples,r*c))
+print(x.shape)
+
+y = create_labels(len(a_train_features), len(c_train_features)).ravel()
+print(y)
 
 # normalize x
-normalize(x)
+#x = x / np.amax(x)
 
 print("Normalized x")
 
-test_data = concat(a_test,c_test)
+test_data = concat(a_test_features,c_test_features)
 
 samples, r,c = test_data.shape
 test_data = np.reshape(test_data, (samples,r*c))
 
-test_data_labels = create_labels(len(a_test), len(c_test)).ravel()
+test_data_labels = create_labels(len(a_test_features), len(c_test_features)).ravel()
 
 print("Created testing data and labels")
 
-normalize(test_data)
+#test_data = test_data / np.amax(test_data)
 
 print("Normalized test data")
 
 print()
+# Depth of 7 seems to work well
 for d in range(1,15):
     print("Depth = ", d)
     clf = RandomForestClassifier(max_depth=d)
