@@ -27,7 +27,7 @@ print(y)
 
 # normalize x
 #normalize(x)
-x = x / 1000
+x = x / 1024
 
 test_data = concat(a_test,c_test)
 
@@ -37,14 +37,27 @@ test_data = np.reshape(test_data, (samples,r*c))
 test_data_labels = create_labels(len(a_test), len(c_test)).ravel()
 
 #normalize(test_data)
-test_data = test_data / 1000
+test_data = test_data / 1024
 
 names = ["Stochastic Gradient Descent", "Passive Aggressive", "Ridge", "Perceptron", "SVC"]
 models = [linear_model.SGDClassifier(), linear_model.PassiveAggressiveClassifier(), linear_model.RidgeClassifier(), 
-        linear_model.Perceptron(), SVC()]
-for i, clf in enumerate(models):
-    print("Current: ", names[i])
-    clf.fit(x,y)
-    results = clf.predict(test_data)
-    print("Accuracy: ", metrics.accuracy_score(test_data_labels, results))
+        linear_model.Perceptron()]# SVC()]
+scores = [[], [], [], []]
+for _ in range(100):
+    for i, clf in enumerate(models):
+        print("Current: ", names[i])
+        clf.fit(x,y)
+        results = clf.predict(test_data)
+        s = metrics.accuracy_score(test_data_labels, results)
+        scores[i].append(s)
+        print("Accuracy: ", s)
 
+SGD_avg = np.average(np.array(scores[0]))
+PA_avg = np.average(np.array(scores[1]))
+Ridge_avg = np.average(np.array(scores[2]))
+Perceptron_avg = np.average(np.array(scores[3]))
+print("Averages") 
+print("SGD: ", SGD_avg)
+print("PA: ", PA_avg)
+print("Ridge: ", Ridge_avg)
+print("Perceptron: ", Perceptron_avg)
