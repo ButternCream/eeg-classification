@@ -4,6 +4,9 @@ from Utils import normalize, concat, create_labels
 from sklearn.naive_bayes import GaussianNB
 from sklearn import linear_model
 from sklearn import metrics
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
 import numpy as np
 
 a_train, a_test = load('./alcohol_compressed/', .7)
@@ -24,7 +27,7 @@ print(y)
 
 # normalize x
 #normalize(x)
-x = x / 1024
+x = x / 1000
 
 test_data = concat(a_test,c_test)
 
@@ -34,10 +37,11 @@ test_data = np.reshape(test_data, (samples,r*c))
 test_data_labels = create_labels(len(a_test), len(c_test)).ravel()
 
 #normalize(test_data)
-test_data = test_data / 1024
+test_data = test_data / 1000
 
-names = ["Stochastic Gradient Descent", "Passive Aggressive", "Ridge", "Perceptron"]
-models = [linear_model.SGDClassifier(), linear_model.PassiveAggressiveClassifier(), linear_model.RidgeClassifier(), linear_model.Perceptron()]
+names = ["Stochastic Gradient Descent", "Passive Aggressive", "Ridge", "Perceptron", "SVC"]
+models = [linear_model.SGDClassifier(), linear_model.PassiveAggressiveClassifier(), linear_model.RidgeClassifier(), 
+        linear_model.Perceptron(), SVC()]
 for i, clf in enumerate(models):
     print("Current: ", names[i])
     clf.fit(x,y)
