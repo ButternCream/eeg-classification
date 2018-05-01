@@ -1,6 +1,6 @@
 from Utils import extract_features
 from Data import load
-from Utils import normalize, concat, create_labels
+from Utils import *
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 import numpy as np
@@ -52,10 +52,7 @@ print("Normalized test data")
 
 print()
 # Depth of 7 seems to work well
-for d in range(1,15):
-    print("Depth = ", d)
-    clf = RandomForestClassifier(max_depth=d)
-    clf.fit(x,y)
-
-    results = clf.predict(test_data)
-    print(metrics.accuracy_score(test_data_labels,results))
+clf = RandomForestClassifier(max_depth=7)
+clf.fit(x,y)
+results = clf.predict(test_data)
+print(metrics.accuracy_score(test_data_labels,results))

@@ -12,9 +12,9 @@ import matplotlib.pyplot as plt
 from Utils import *
 
 model = None
+a_train, a_test = load('./alcohol_compressed/', .8)
+c_train, c_test = load('./control_compressed/', .8)
 if not os.path.isfile("eeg_TrainedModel.h5"):
-    a_train, a_test = load('./alcohol_compressed/', .8)
-    c_train, c_test = load('./control_compressed/', .8)
         
     # simpler format for building your arrays
 
@@ -28,11 +28,12 @@ if not os.path.isfile("eeg_TrainedModel.h5"):
     test_data_labels = create_labels(len(a_test), len(c_test)).ravel()
     normalize(test_data)
 
-    train = convert_to_images(train, 224)
-    test_data = convert_to_images(test_data, 224)
+    #train = convert_to_images(train, 224)
+    #test_data = convert_to_images(test_data, 224)
     
     print("Created testing data and labels")
 
+    '''
     # VGG Base model from keras
     base_model = keras.applications.vgg16.VGG16(weights="imagenet", include_top=False,input_shape=(224,224,3), pooling='avg')
     input = Input(shape=(224,224,3))
@@ -42,9 +43,8 @@ if not os.path.isfile("eeg_TrainedModel.h5"):
     x = Dense(1, activation='sigmoid')(x)
 
     model = Model(inputs=input, outputs=x)
-
-    # Original
     '''
+    # Original
     model = Sequential()
     model.add(Dense(256, input_shape=train.shape[1:]))
     model.add(Activation('relu'))
@@ -54,7 +54,6 @@ if not os.path.isfile("eeg_TrainedModel.h5"):
     model.add(Flatten()) # must flatten to ensure we have a 1d array going into our prediction layer
     model.add(Dense(1))
     model.add(Activation('sigmoid'))
-    '''
     '''
     # Custom CNN
     model = Sequential()
@@ -76,7 +75,10 @@ if not os.path.isfile("eeg_TrainedModel.h5"):
     from keras.callbacks import EarlyStopping
     my_callbacks = [EarlyStopping(monitor='loss', patience=3, mode='auto')]
     
-    model.fit(train, labels_train, epochs=10, batch_size=16, callbacks=my_callbacks)
+    history = model.fit(train, labels_train, epochs=15, batch_size=32, callbacks=my_callbacks)
+
+    save_plot(history, "original_model.png")
+    
     #save model
     print("saving model...")
     model.save("eeg_TrainedModel.h5")
@@ -93,7 +95,7 @@ scores = model.evaluate(test_data, test_data_labels, verbose=0)
 print("eval acc = ", scores[1]*100)
 print("eval size =", len(scores))
 print("Testing using predictions...")
-preds = model.predict(test_data, batch_size=16, verbose=1)
+preds = model.predict(test_data, batch_size=32, verbose=1)
 print(preds)
 print(preds.shape)
 

@@ -2,6 +2,17 @@ import numpy as np
 from threading import Thread
 from Data import timer
 from PIL import Image
+import matplotlib.pyplot as plt
+
+def save_plot(history, filename):
+    plt.plot(history.history['acc'])
+    plt.plot(history.history['loss'])
+    plt.title('Model Accuracy vs Loss')
+    plt.ylabel('Value')
+    plt.xlabel('Epoch')
+    plt.legend(['Accuracy', 'Loss'], loc='upper right')
+    #plt.show()
+    plt.savefig(filename)
 
 def normalize(array):
     a_min = np.amin(array)
