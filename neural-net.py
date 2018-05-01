@@ -28,17 +28,27 @@ if not os.path.isfile("eeg_TrainedModel.h5"):
     test_data_labels = create_labels(len(a_test), len(c_test)).ravel()
     normalize(test_data)
 
-    #train = convert_to_images(train, 224)
-    #test_data = convert_to_images(test_data, 224)
+    train = convert_to_images(train, 224)
+    plt.imshow(train[5])
+    plt.show()
+    test_data = convert_to_images(test_data, 224)
     
     print("Created testing data and labels")
 
-    '''
+    fine_tuning = range(10)
     # VGG Base model from keras
-    base_model = keras.applications.vgg16.VGG16(weights="imagenet", include_top=False,input_shape=(224,224,3), pooling='avg')
+    base_model = keras.applications.inception_v3.InceptionV3(weights="imagenet", include_top=False,input_shape=(224,224,3), pooling='avg')
+    count = 1
+    for layer in reversed(base_model.layers):
+        if layer.count_params() > 0:
+            if count in fine_tuning:
+                layer.trainable = True
+            else:
+                layer.trainable = False
+            count += 1
     input = Input(shape=(224,224,3))
     output_conv = base_model(input)
-    x = Dense(1024, activation='relu', name='layer1')(output_conv)
+    x = Dense(128, activation='relu', name='layer1')(output_conv)
     x = Dropout(0.5)(x)
     x = Dense(1, activation='sigmoid')(x)
 
@@ -53,7 +63,8 @@ if not os.path.isfile("eeg_TrainedModel.h5"):
     model.add(Dropout(0.5))
     model.add(Flatten()) # must flatten to ensure we have a 1d array going into our prediction layer
     model.add(Dense(1))
-    model.add(Activation('sigmoid'))
+    moodel.add(Activation('sigmoid'))
+    '''
     '''
     # Custom CNN
     model = Sequential()
@@ -75,9 +86,9 @@ if not os.path.isfile("eeg_TrainedModel.h5"):
     from keras.callbacks import EarlyStopping
     my_callbacks = [EarlyStopping(monitor='loss', patience=3, mode='auto')]
     
-    history = model.fit(train, labels_train, epochs=15, batch_size=32, callbacks=my_callbacks)
+    history = model.fit(train, labels_train, epochs=10, batch_size=32, callbacks=my_callbacks)
 
-    save_plot(history, "original_model.png")
+    save_plot(history, "image_model.png")
     
     #save model
     print("saving model...")

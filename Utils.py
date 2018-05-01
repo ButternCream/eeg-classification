@@ -15,9 +15,12 @@ def save_plot(history, filename):
     plt.savefig(filename)
 
 def normalize(array):
+    a_max = np.amax(array)
     a_min = np.amin(array)
-    array = array - a_min
-    array = array / 255
+    array = array + (a_max - a_min)
+    array = np.uint8(array)
+    array = array / 256
+
 
 def concat(list_one, list_two):
     return np.concatenate((np.array(list_one), np.array(list_two)))
@@ -208,7 +211,7 @@ def convert_to_images(images, image_size):
         if image is not None:
             i += 1
             image = np.squeeze(image)
-            bw_image = Image.fromarray(image,"L")
+            bw_image = Image.fromarray(np.uint8(image),"L")
             rbg_image = Image.new("RGB", bw_image.size)
             rbg_image.paste(bw_image)
             rbg_image = rbg_image.resize((image_size,image_size), Image.ANTIALIAS)
